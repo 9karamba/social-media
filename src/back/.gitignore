@@ -1,0 +1,13 @@
+# dependencies
+node_modules/
+
+# IDE
+/.idea
+/.awcache
+/.vscode
+
+yarn.lock
+.env
+/package-lock.json
+/.yarnrc.yml
+/.yarn

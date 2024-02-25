@@ -1,0 +1,17 @@
+{
+  "name": "social-media",
+  "version": "1.0.0",
+  "repository": "https://github.com/9karamba/social-media",
+  "license": "ISC",
+  "private": true,
+  "engines": {
+    "npm": "Please use yarn instead of NPM to install dependencies"
+  },
+  "workspaces": [
+    "src/*"
+  ],
+  "scripts": {
+    "dev": "yarn workspaces foreach -A -p -v -i run dev",
+    "build": "yarn workspaces foreach -A -p -v -i run build"
+  }
+}
