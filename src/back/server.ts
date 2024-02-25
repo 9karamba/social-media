@@ -72,7 +72,7 @@ class Server {
                     id === undefined || password === undefined ||
                     String(id).trim() === "" || String(password).trim() === ""
                 ) {
-                    return response.status(400).send({ error: 'Неверные данные' });
+                    return response.status(400).send({ error: 'Невалидные данные' });
                 }
 
                 const userModel = new User();
@@ -80,7 +80,7 @@ class Server {
                 if (!user) return response.status(404).send({ error: 'Пользователь не найден' });
 
                 if (!await bcrypt.compare(password, user.password)) {
-                    return response.status(400).send({ error: 'Неверные данные' });
+                    return response.status(400).send({ error: 'Невалидные данные' });
                 }
 
                 const token = jwt.sign({ id: user.id, username: user.firstName }, process.env.SECRET_KEY ?? "");
@@ -116,7 +116,7 @@ class Server {
                         return false;
                     } )
                 ) {
-                    return response.status(400).send({ error: 'Неверные данные' });
+                    return response.status(400).send({ error: 'Невалидные данные' });
                 }
 
                 const userModel = new User();
@@ -141,6 +141,30 @@ class Server {
         })
 
     }
+
+    public async getUserEndpoint(): Promise<void> {
+        this.app.get('/user/get/:id', async (request: FastifyRequest<{
+            Params: { id: number }
+        }>, response: FastifyReply) => {
+            try {
+                const { id } = request.params;
+
+                if (typeof id !== 'number') {
+                    return response.status(400).send({ error: 'Невалидные данные' });
+                }
+
+                const userModel = new User();
+                const user = await userModel.get(id);
+                if (!user) return response.status(404).send({ error: 'Анкета не найдена' });
+
+                return response.status(200).send({user});
+            } catch (e) {
+                console.log(e);
+                response.code(500).send({ error: 'Внутренняя ошибка сервера' });
+            }
+        })
+
+    }
 }
 
 const server = new Server(process.env.PORT || "8083");
@@ -152,6 +176,10 @@ server.loginEndpoint().then(() => {
 
 server.registerEndpoint().then(() => {
     console.log('Register endpoint is up')
+})
+
+server.getUserEndpoint().then(() => {
+    console.log('Get user endpoint is up')
 })
 
 server.abortOnErrors();
