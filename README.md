@@ -22,7 +22,7 @@ PG_DB=postgres
 SECRET_KEY=pass
 ```
 
-4. Finally run command:
+4. Finally, run command:
 ```sh
 yarn run dev
 ```
