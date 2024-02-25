@@ -1,8 +1,8 @@
 import {Pool} from 'pg';
 
 class DBHandler {
-    private static client: Pool | undefined;
-    private static userTable = 'user';
+    public static client: Pool | undefined;
+    public static userTable = 'user';
 
     public static async connect(): Promise<void>
     {
@@ -30,13 +30,12 @@ class DBHandler {
     {
         const query = `CREATE TABLE IF NOT EXISTS "${DBHandler.userTable}" (
             id serial PRIMARY KEY,
-            email VARCHAR(100) NOT NULL,
-            password_hash VARCHAR(100) NOT NULL,
+            password VARCHAR(100) NOT NULL,
             firstName VARCHAR(100),
-            lastName VARCHAR(100),
-            date_of_birth DATE,
+            secondName VARCHAR(100),
+            birthdate DATE,
             gender VARCHAR(10),
-            interests TEXT,
+            biography TEXT,
             city VARCHAR(50)
         );`;
         await DBHandler.client

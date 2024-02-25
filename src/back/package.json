@@ -16,7 +16,10 @@
   "private": true,
   "dependencies": {
     "@fastify/cors": "^8.4.1",
+    "@types/bcrypt": "^5.0.2",
+    "@types/jsonwebtoken": "^9.0.5",
     "alphanumeric-id": "^1.0.1",
+    "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "dotenv-extended": "^2.9.0",
@@ -24,6 +27,7 @@
     "formidable": "^3.5.1",
     "inline-css": "^4.0.2",
     "ip": "^1.1.8",
+    "jsonwebtoken": "^9.0.2",
     "pg": "^8.11.3",
     "prom-client": "15.0.0"
   },
