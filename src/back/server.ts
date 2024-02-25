@@ -3,7 +3,7 @@ import * as dotenv from 'dotenv';
 import Fastify, {FastifyInstance, FastifyReply, FastifyRequest} from 'fastify';
 import cors from '@fastify/cors';
 import DBHandler from "./components/DBHandler";
-import {ILoginBody} from "./support/Interfaces";
+import {ILoginBody, IRegisterBody, IUser} from "./support/Interfaces";
 import User from "./models/User";
 import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
@@ -61,7 +61,7 @@ class Server {
         })
     }
 
-    public async startWebhooksEndpoint(): Promise<void> {
+    public async loginEndpoint(): Promise<void> {
         this.app.post('/login', async (request: FastifyRequest<{
             Body: ILoginBody;
         }>, response: FastifyReply) => {
@@ -92,13 +92,66 @@ class Server {
         })
 
     }
+
+    public async registerEndpoint(): Promise<void> {
+        this.app.post('/user/register', async (request: FastifyRequest<{
+            Body: IRegisterBody;
+        }>, response: FastifyReply) => {
+            try {
+                const {
+                    password,
+                    firstName,
+                    secondName,
+                    birthdate,
+                    gender,
+                    biography,
+                    city
+                } = request.body;
+
+                if (
+                    Object.keys(request.body).some((key: string) => {
+                        if ([ 'password','firstName','secondName','birthdate','gender','biography','city'].indexOf(key)) {
+                            return typeof request.body[key] !== "string";
+                        }
+                        return false;
+                    } )
+                ) {
+                    return response.status(400).send({ error: 'Неверные данные' });
+                }
+
+                const userModel = new User();
+                const passwordHash = await bcrypt.hash(password, 10);
+
+                const userId = userModel.create([
+                    passwordHash,
+                    firstName,
+                    secondName,
+                    new Date(birthdate),
+                    gender,
+                    biography,
+                    city
+                ]);
+
+                const token = jwt.sign({ id: userId, username: firstName }, process.env.SECRET_KEY ?? "");
+                return response.status(200).send({user_id: token});
+            } catch (e) {
+                console.log(e);
+                response.code(500).send({ error: 'Внутренняя ошибка сервера' });
+            }
+        })
+
+    }
 }
 
 const server = new Server(process.env.PORT || "8083");
 server.init();
 
-server.startWebhooksEndpoint().then(() => {
-    console.log('Webhook endpoint is up')
+server.loginEndpoint().then(() => {
+    console.log('Login endpoint is up')
+})
+
+server.registerEndpoint().then(() => {
+    console.log('Register endpoint is up')
 })
 
 server.abortOnErrors();
