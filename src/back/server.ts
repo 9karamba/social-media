@@ -122,7 +122,7 @@ class Server {
                 const userModel = new User();
                 const passwordHash = await bcrypt.hash(password, 10);
 
-                const userId = userModel.create([
+                const userId = await userModel.create([
                     passwordHash,
                     firstName,
                     secondName,
@@ -131,9 +131,10 @@ class Server {
                     biography,
                     city
                 ]);
+                if (!userId) return response.status(400).send({ error: 'Невалидные данные' });
 
                 const token = jwt.sign({ id: userId, username: firstName }, process.env.SECRET_KEY ?? "");
-                return response.status(200).send({user_id: token});
+                return response.status(200).send({user_id: userId, token});
             } catch (e) {
                 console.log(e);
                 response.code(500).send({ error: 'Внутренняя ошибка сервера' });
@@ -144,12 +145,12 @@ class Server {
 
     public async getUserEndpoint(): Promise<void> {
         this.app.get('/user/get/:id', async (request: FastifyRequest<{
-            Params: { id: number }
+            Params: { id: string | undefined }
         }>, response: FastifyReply) => {
             try {
                 const { id } = request.params;
 
-                if (typeof id !== 'number') {
+                if (typeof id !== 'string') {
                     return response.status(400).send({ error: 'Невалидные данные' });
                 }
 

@@ -19,11 +19,10 @@ class DBHandler {
                 throw new Error(`connection error: ${err.stack}`);
             } else {
                 DBHandler.client = client;
+                DBHandler.createTables();
                 return console.log('connected')
             }
         });
-
-        await DBHandler.createTables();
     }
 
     private static async createTables(): Promise<void>
