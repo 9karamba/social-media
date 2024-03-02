@@ -14,9 +14,9 @@ services:
       - "5432:5432"
     volumes:
       - db:/var/lib/postgres
-      - ./sql/init.sql:/init.sql
-    networks:
-      - my_network
+      - type: bind
+        source: ./db
+        target: /data
 
   app:
     depends_on:
@@ -34,12 +34,6 @@ services:
     ports:
       - "8083:8083"
     platform: linux/amd64
-    networks:
-      - my_network
-
-networks:
-  my_network:
-    driver: bridge
 
 volumes:
   db:

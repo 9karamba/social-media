@@ -29,7 +29,7 @@ class DBHandler {
     {
         const query = `CREATE TABLE IF NOT EXISTS "${DBHandler.userTable}" (
             id serial PRIMARY KEY,
-            password VARCHAR(100) NOT NULL,
+            password VARCHAR(100),
             firstName VARCHAR(100),
             secondName VARCHAR(100),
             birthdate DATE,
