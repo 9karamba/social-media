@@ -9,7 +9,7 @@ class DBHandler {
         const client: Pool = new Pool({
             user: process.env.PG_USER,
             password: process.env.PG_PASS,
-            host: process.env.PG_HOST,
+            host: process.env.PG_HOST ?? "localhost",
             port: 5432,
             database: process.env.PG_DB
         })
