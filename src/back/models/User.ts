@@ -2,10 +2,11 @@ import {IRegisterBody, IUser} from "../support/Interfaces";
 import DBHandler from "../components/DBHandler";
 
 export default class User {
+    public static readonly tableName = `user`;
     public async get(id: number | string): Promise<IUser | null> {
-        const result = await DBHandler.client?.query({
+        const result = await DBHandler.getClient()?.query({
             text: `SELECT *
-                   FROM "${DBHandler.userTable}"
+                   FROM "${User.tableName}"
                    WHERE id = $1`,
             values: [id],
         }).catch(async (err) => {
@@ -17,8 +18,8 @@ export default class User {
     }
 
     public async create(userData: Array<string | object>): Promise<number | null> {
-        const result = await DBHandler.client?.query({
-            text: `INSERT INTO "${DBHandler.userTable}" (
+        const result = await DBHandler.getClient()?.query({
+            text: `INSERT INTO "${User.tableName}" (
                      password,
                      firstName,
                      secondName,

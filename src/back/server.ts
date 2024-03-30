@@ -36,7 +36,7 @@ class Server {
             origin: '*',
         })
 
-        await DBHandler.connect();
+        await DBHandler.getInstance();
 
         this.app.addHook('preHandler', (req: FastifyRequest, reply: FastifyReply, next: () => void) => {
             if (!serviceAvailable) {
