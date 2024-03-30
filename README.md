@@ -15,5 +15,5 @@ To fill database with test data:
 ```sh
 docker exec -it [container_id] psql -U otususer -d postgres
 
-\copy "user" (firstName,birthdate,city) FROM '/data/people.csv' DELIMITER ',' CSV HEADER;
+\copy "user" (birthdate,city,firstName,secondName) FROM '/data/people.csv' DELIMITER ',' CSV HEADER;
 ```
