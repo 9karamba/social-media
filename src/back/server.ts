@@ -139,6 +139,30 @@ class Server {
         })
 
     }
+
+    public async searchUserEndpoint(): Promise<void> {
+        this.app.get('/user/search', async (request: FastifyRequest<{
+            Querystring: { first_name?: string; last_name?: string; }
+        }>, response: FastifyReply) => {
+            try {
+                const { first_name, last_name } = request.query;
+
+                if (typeof first_name !== 'string' || typeof last_name !== 'string') {
+                    return response.status(400).send({ error: 'Невалидные данные' });
+                }
+
+                const userModel = new User();
+                const user = await userModel.search(first_name, last_name);
+                if (!user) return response.status(404).send({ error: 'Анкета не найдена' });
+
+                return response.status(200).send({user});
+            } catch (e) {
+                console.log(e);
+                response.code(500).send({ error: 'Внутренняя ошибка сервера' });
+            }
+        })
+
+    }
 }
 
 const server = new Server(process.env.PORT || "8083");
@@ -154,6 +178,10 @@ server.registerEndpoint().then(() => {
 
 server.getUserEndpoint().then(() => {
     console.log('Get user endpoint is up')
+})
+
+server.searchUserEndpoint().then(() => {
+    console.log('Search user endpoint is up')
 })
 
 server.abortOnErrors();

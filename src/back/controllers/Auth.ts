@@ -35,7 +35,7 @@ export default class Auth {
             passwordHash,
             firstName,
             secondName,
-            new Date(birthdate),
+            birthdate,
             gender,
             biography,
             city

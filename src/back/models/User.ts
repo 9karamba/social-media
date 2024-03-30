@@ -8,8 +8,8 @@ export default class User {
             text: `SELECT *
                    FROM "${User.tableName}"
                    WHERE id = $1`,
-            values: [id],
-        }).catch(async (err) => {
+            values: [String(id)],
+        }).catch(async (err: string) => {
             console.log("error get user: " + err);
         });
 
@@ -17,7 +17,7 @@ export default class User {
         return null;
     }
 
-    public async create(userData: Array<string | object>): Promise<number | null> {
+    public async create(userData: Array<string>): Promise<number | null> {
         const result = await DBHandler.getClient()?.query({
             text: `INSERT INTO "${User.tableName}" (
                      password,
@@ -35,5 +35,20 @@ export default class User {
 
         if (result?.rows[0] !== undefined) return result.rows[0]["id"];
         return null;
+    }
+
+    public async search(firstName: string, secondName: string): Promise<Array<IUser>> {
+        const result = await DBHandler.getClient()?.query({
+            text: `SELECT U.id, U.firstName, U.secondName, U.birthdate, U.gender, U.biography, U.city
+                   FROM "${User.tableName}" AS U
+                   WHERE firstName LIKE $1 and secondName LIKE $2
+                   ORDER BY U.id`,
+            values: [`%${firstName}%`, `%${secondName}%`],
+        }).catch(async (err) => {
+            console.log("error get user: " + err);
+        });
+
+        if (result?.rows[0] !== undefined) return result.rows;
+        return [];
     }
 }
