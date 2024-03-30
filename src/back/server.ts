@@ -3,10 +3,8 @@ import * as dotenv from 'dotenv';
 import Fastify, {FastifyInstance, FastifyReply, FastifyRequest} from 'fastify';
 import cors from '@fastify/cors';
 import DBHandler from "./components/DBHandler";
-import {ILoginBody, IRegisterBody, IUser} from "./support/Interfaces";
+import {ILoginBody, IRegisterBody} from "./support/Interfaces";
 import User from "./models/User";
-import bcrypt from "bcrypt";
-import jwt from 'jsonwebtoken';
 import Auth from "./controllers/Auth";
 
 dotenv.config({
@@ -118,12 +116,19 @@ class Server {
 
     public async getUserEndpoint(): Promise<void> {
         this.app.get('/user/get/:id', async (request: FastifyRequest<{
+            Header: { authorization: string; };
             Params: { id: string | undefined }
         }>, response: FastifyReply) => {
             try {
                 const { id } = request.params;
+                const token = request.headers.authorization?.split(' ')[1];
 
-                if (typeof id !== 'string') {
+                if (typeof id !== 'string' || token === undefined) {
+                    return response.status(400).send({ error: 'Невалидные данные' });
+                }
+
+                const authController = new Auth();
+                if (!(await authController.canLogin(token))) {
                     return response.status(400).send({ error: 'Невалидные данные' });
                 }
 
@@ -142,17 +147,24 @@ class Server {
 
     public async searchUserEndpoint(): Promise<void> {
         this.app.get('/user/search', async (request: FastifyRequest<{
+            Header: { authorization: string; };
             Querystring: { first_name?: string; last_name?: string; }
         }>, response: FastifyReply) => {
             try {
                 const { first_name, last_name } = request.query;
+                const token = request.headers.authorization?.split(' ')[1];
 
-                if (typeof first_name !== 'string' || typeof last_name !== 'string') {
+                if (token === undefined) {
+                    return response.status(400).send({ error: 'Невалидные данные' });
+                }
+
+                const authController = new Auth();
+                if (!(await authController.canLogin(token))) {
                     return response.status(400).send({ error: 'Невалидные данные' });
                 }
 
                 const userModel = new User();
-                const user = await userModel.search(first_name, last_name);
+                const user = await userModel.search(first_name ?? '', last_name ?? '');
                 if (!user) return response.status(404).send({ error: 'Анкета не найдена' });
 
                 return response.status(200).send({user});

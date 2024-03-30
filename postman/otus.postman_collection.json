@@ -13,7 +13,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"id\": 123,\n    \"password\": \"123\"\n}",
+					"raw": "{\n    \"id\": 3,\n    \"password\": \"test\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -41,7 +41,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"password\": \"test\",\n    \"firstName\": \"Alex\",\n    \"secondName\": \"Smith\",\n    \"birthdate\": \"1990-05-15\",\n    \"gender\": \"male\",\n    \"biography\": \"\",\n    \"city\": \"London\"\n}",
+					"raw": "{\n    \"password\": \"test\",\n    \"firstName\": \"Alex\",\n    \"secondName\": \"Test\",\n    \"birthdate\": \"1990-05-15\",\n    \"gender\": \"male\",\n    \"biography\": \"\",\n    \"city\": \"London\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -66,10 +66,20 @@
 		{
 			"name": "Get user",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNzExODE1MDU5fQ.EQ_sjdPiqXZ7iKx6E_P-1dFCzGcaB9GtkLAmADxSIa8",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8083/user/get/2",
+					"raw": "http://localhost:8083/user/get/3",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -78,7 +88,47 @@
 					"path": [
 						"user",
 						"get",
-						"2"
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search user",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNzExODE1MDU5fQ.EQ_sjdPiqXZ7iKx6E_P-1dFCzGcaB9GtkLAmADxSIa8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8083/user/search?first_name=Alex&last_name=Smith",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"user",
+						"search"
+					],
+					"query": [
+						{
+							"key": "first_name",
+							"value": "Alex"
+						},
+						{
+							"key": "last_name",
+							"value": "Smith"
+						}
 					]
 				}
 			},
