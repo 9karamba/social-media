@@ -7,6 +7,7 @@ import {ILoginBody, IRegisterBody, IUser} from "./support/Interfaces";
 import User from "./models/User";
 import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
+import Auth from "./controllers/Auth";
 
 dotenv.config({
     path: join(process.cwd(), '/../../.env')
@@ -75,16 +76,10 @@ class Server {
                     return response.status(400).send({ error: 'Невалидные данные' });
                 }
 
-                const userModel = new User();
-                const user = await userModel.get(id);
-                if (!user) return response.status(404).send({ error: 'Пользователь не найден' });
+                const authController = new Auth();
+                const result = await authController.login(String(id), password);
 
-                if (!await bcrypt.compare(password, user.password)) {
-                    return response.status(400).send({ error: 'Невалидные данные' });
-                }
-
-                const token = jwt.sign({ id: user.id, username: user.firstName }, process.env.SECRET_KEY ?? "");
-                return response.status(200).send({token});
+                return response.status(result.status).send(result);
             } catch (e) {
                 console.log(e);
                 response.code(500).send({ error: 'Внутренняя ошибка сервера' });
@@ -98,16 +93,6 @@ class Server {
             Body: IRegisterBody;
         }>, response: FastifyReply) => {
             try {
-                const {
-                    password,
-                    firstName,
-                    secondName,
-                    birthdate,
-                    gender,
-                    biography,
-                    city
-                } = request.body;
-
                 if (
                     Object.keys(request.body).some((key: string) => {
                         if ([ 'password','firstName','secondName','birthdate','gender','biography','city'].indexOf(key)) {
@@ -119,22 +104,10 @@ class Server {
                     return response.status(400).send({ error: 'Невалидные данные' });
                 }
 
-                const userModel = new User();
-                const passwordHash = await bcrypt.hash(password, 10);
+                const authController = new Auth();
+                const result = await authController.register(request.body);
 
-                const userId = await userModel.create([
-                    passwordHash,
-                    firstName,
-                    secondName,
-                    new Date(birthdate),
-                    gender,
-                    biography,
-                    city
-                ]);
-                if (!userId) return response.status(400).send({ error: 'Невалидные данные' });
-
-                const token = jwt.sign({ id: userId, username: firstName }, process.env.SECRET_KEY ?? "");
-                return response.status(200).send({user_id: userId, token});
+                return response.status(result.status).send(result);
             } catch (e) {
                 console.log(e);
                 response.code(500).send({ error: 'Внутренняя ошибка сервера' });
